@@ -125,7 +125,7 @@
         },
         "fluent-ffmpeg": {
             "optional": true
-        }
+        },
         "jimp": {
             "optional": true
         },
