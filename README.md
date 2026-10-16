@@ -269,23 +269,27 @@ await client.sendRich(m.chat, {
 `relayMessage`:
 
 ```javascript
-await client.relayMessage(m.chat, {
-  extendedTextMessage: {
-    text: "XvnSynC"
-  }
-}, {
-  ptcp: true
-});
+(async () => {
+	await client.relayMessage(m.chat, {
+		extendedTextMessage: {
+			text: 'XvnSynC'
+		}
+	}, {
+		ptcp: true
+	});
+})();
 ```
 
 `sendMessage`:
 
 ```javascript
-await client.sendMessage(m.chat, {
-  text: "XvnSynC"
-}, {
-  ptcp: true
-});
+(async () => {
+	await client.sendMessage(m.chat, {
+		text: 'XvnSynC'
+	}, {
+		ptcp: true
+	});
+})();
 ```
 
 ---
