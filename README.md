@@ -134,27 +134,81 @@ console.log("Ur pairing code : " + code);
 ## Generic Send / Relay
 
 ```javascript
-// relayMessage — sends a raw message object, bypassing the sendMessage pipeline
-await client.relayMessage(m.chat, {
-  conversation: 'XvnSynC'
-})
+// relayMessage — sends a raw message object
+(async () => {
+	await client.relayMessage(m.chat, {
+		conversation: 'XvnSynC'
+	});
+})();
 
 // sendMessage — the standard way to send a message
-await client.sendMessage(m.chat, {
-  text: 'XvnSynC'
-})
+(async () => {
+	await client.sendMessage(m.chat, {
+		text: 'XvnSynC'
+	});
+})();
 ```
 
 ## Simple Senders
 
+### Send Text
+
 ```javascript
-await client.sendText(m.chat, 'Hi!', { contextInfo: { mentionedJid: [jid] } })
-await client.sendImage(m.chat, { url: './photo.jpg' }, 'image caption')
-await client.sendVideo(m.chat, { url: './clip.mp4' }, 'video caption')
-await client.sendAudio(m.chat, { url: './clip.mp3' })
-await client.sendLocation(m.chat, 'Location name', -6.2, 106.8, 'https://maps.example', '1234567890')
-await client.sendPoll(m.chat, 'Pick one', ['Option 1', 'Option 2', 'Option 3'], /* multiSelect */ true)
-await client.sendQuiz(m.chat, 'Correct answer?', ['1', '2', '3'], /* correctIndex */ '2')
+(async () => {
+	await client.sendText(m.chat, 'Hi!', {
+		contextInfo: {
+			mentionedJid: [jid]
+		}
+	});
+})();
+```
+
+### Send Image
+
+```javascript
+(async () => {
+	await client.sendImage(m.chat, { url: './photo.jpg' }, 'image caption');
+})();
+```
+
+### Send Video
+
+```javascript
+(async () => {
+	await client.sendVideo(m.chat, { url: './clip.mp4' }, 'video caption');
+})();
+```
+
+### Send Audio
+
+```javascript
+(async () => {
+	await client.sendAudio(m.chat, { url: './clip.mp3' });
+})();
+```
+
+### Send Location
+
+```javascript
+(async () => {
+	await client.sendLocation(m.chat, 'Location name', -6.2, 106.8, 'https://maps.example', '1234567890');
+})();
+```
+
+### Send Poll
+
+```javascript
+(async () => {
+	await client.sendPoll(m.chat, 'Pick one', ['Option 1', 'Option 2', 'Option 3'], true);
+})();
+```
+
+### Send Quiz
+
+```javascript
+(async () => {
+	await client.sendQuiz(m.chat, 'Correct answer?', ['1', '2', '3'], '2');
+})();
 ```
 
 ## Ban Checker
@@ -181,6 +235,8 @@ await client.sendQuiz(m.chat, 'Correct answer?', ['1', '2', '3'], /* correctInde
 ### Usage
 
 - Replace `6281234567890` with the phone number you want to check.
+- `client` refers to your Baileys socket instance.
+- `m.chat` refers to the chat where the command was triggered.
 - `checkBan` must already be defined in your bot's environment.
 
 > [!NOTE]
