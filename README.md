@@ -21,7 +21,7 @@
 
 ---
 
-# Table of Contents 
+# Table of Contents
 
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -29,21 +29,22 @@
 - [Quick Start](#quick-start)
   - [With QR Code](#with-qr-code)
   - [With Pairing Code](#with-pairing-code)
-- [Sending Message](#sending-messate)
+- [Sending Message](#sending-message)
   - [Generic Send / Relay](#generic-send--relay)
   - [Simple Senders](#simple-senders)
+  - [Ban Checker](#ban-checker)
   - [Rich Menu](#rich-menu)
   - [Sending Message with Participant](#sending-message-with-participant)
 - [Message Builder](#message-builder)
-  - [Import](#import)
-  - [Example](#examle)
+  - [Import](#import-1)
+  - [Example](#example)
 - [Button](#button)
   - [Quick Reply + URL + Copy](#quick-reply--url--copy)
 - [ButtonV2](#buttonv2)
 - [Carousel](#carousel)
 - [Why Choose WhatsApp Baileys?](#why-choose-whatsapp-baileys)
 - [Contributors](#contributors)
-- [Contact Developer](#contact-developer)
+- [Contact & Support](#contact--support)
 
 ---
 
@@ -55,7 +56,7 @@
   - `link-preview-js` for link previews
   - `audio-decode` for audio waveform handling
   - `fluent-ffmpeg` for frame preview video, MessageBuilder Toolkit.getMp4Preview
-  
+
 ---
 
 # Installation
@@ -156,6 +157,35 @@ await client.sendPoll(m.chat, 'Pick one', ['Option 1', 'Option 2', 'Option 3'], 
 await client.sendQuiz(m.chat, 'Correct answer?', ['1', '2', '3'], /* correctIndex */ '2')
 ```
 
+## Ban Checker
+
+`checkBan` allows you to check the WhatsApp ban status of a phone number using an external API.
+
+### Example
+
+```javascript
+(async () => {
+	try {
+		const number = '6281234567890';
+		const result = await checkBan(number);
+
+		await client.sendMessage(m.chat, {
+			text: JSON.stringify(result, null, 2)
+		});
+	} catch (error) {
+		console.error('Ban Checker Error:', error.message);
+	}
+})();
+```
+
+### Usage
+
+- Replace `6281234567890` with the phone number you want to check.
+- `checkBan` must already be defined in your bot's environment.
+
+> [!NOTE]
+> Ban Checker relies on an external API. Its availability and accuracy depend on the API provider. Results are not an official confirmation of a WhatsApp account's ban status.
+
 ## Rich Menu
 
 `sendRich` sends a rich response with an optional header image, action buttons, carousel cards, and an open-URL footer:
@@ -212,12 +242,12 @@ MessageBuilder v4.7 is included directly in `"github:xvnsync/xbails"`.
 
 ```javascript
 const {
-  VERSION, 
-  Button, 
-  ButtonV2, 
-  Carousel, 
-  AIRich, 
-  Toolkit, 
+  VERSION,
+  Button,
+  ButtonV2,
+  Carousel,
+  AIRich,
+  Toolkit,
   bind,
   MB
 } = require('@whiskeysockets/baileys');
@@ -277,7 +307,7 @@ await msg.send(m.chat)
 
 `ButtonV2` provides a simpler classic button builder.
 
-```javasript
+```javascript
 const { MB } = require('@whiskeysockets/baileys')
 
 const message = new MB.ButtonV2(client)
@@ -298,7 +328,7 @@ await message.send(m.chat)
 
 Carousel cards can be created from `Button.toCard()` and then submitted to `Carousel`.
 
-```js
+```javascript
 const { MB } = require('@whiskeysockets/baileys')
 
 const card1 = await new MB.Button(client)
@@ -347,10 +377,22 @@ Because this library offers high stability, full features, and an actively impro
 
 ---
 
-## Contact Developer
+## Contact & Support
 
-For questions, support, or collaboration, feel free to contact the developer:
+Have questions, suggestions, or need help with this project? Feel free to reach out through the channels below.
 
-- **Telegram**: [Telegram Contact](https://t.me/luyatiem)
-- **Channel WhatsApp**: [Channel WhatsApp](https://whatsapp.com/channel/0029VbDlfld4yltRwFKFL73X)
-- **Channel Telegram**: [Channel Telegram](https://t.me/aboutvin7x)
+<p align="center">
+  <a href="https://t.me/luyatiem">
+    <img src="https://img.shields.io/badge/Telegram-Contact%20Developer-26A5E4?style=flat-square&logo=telegram&logoColor=white" alt="Telegram"/>
+  </a>
+  <a href="https://whatsapp.com/channel/0029VbDlfld4yltRwFKFL73X">
+    <img src="https://img.shields.io/badge/WhatsApp-Official%20Channel-25D366?style=flat-square&logo=whatsapp&logoColor=white" alt="WhatsApp Channel"/>
+  </a>
+  <a href="https://t.me/aboutvin7x">
+    <img src="https://img.shields.io/badge/Telegram-Updates-2CA5E0?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Channel"/>
+  </a>
+</p>
+
+<p align="center">
+  <sub>Developed and maintained by <a href="https://github.com/xvnsync">Melvin D Zephyrine</a>.</sub>
+</p>
