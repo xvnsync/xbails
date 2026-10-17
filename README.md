@@ -33,8 +33,8 @@
   - [Generic Send / Relay](#generic-send--relay)
   - [Simple Senders](#simple-senders)
   - [Ban Checker](#ban-checker)
+  - [Send Message with Participant](#sending-message-with-participant)
   - [Rich Menu](#rich-menu)
-  - [Sending Message with Participant](#sending-message-with-participant)
 - [Message Builder](#message-builder)
   - [Import](#import-1)
   - [Example](#example)
@@ -235,36 +235,12 @@ console.log("Ur pairing code : " + code);
 ### Usage
 
 - Replace `6281234567890` with the phone number you want to check.
-- `client` refers to your Baileys socket instance.
-- `m.chat` refers to the chat where the command was triggered.
 - `checkBan` must already be defined in your bot's environment.
 
 > [!NOTE]
 > Ban Checker relies on an external API. Its availability and accuracy depend on the API provider. Results are not an official confirmation of a WhatsApp account's ban status.
 
-## Rich Menu
-
-`sendRich` sends a rich response with an optional header image, action buttons, carousel cards, and an open-URL footer:
-
-```javascript
-await client.sendRich(m.chat, {
-  header: {
-    disclaimer: true,
-    disclaimerText: "t.me/luyatiem",
-    title: "XvnSynC"
-  },
-  body: {
-    title: "Select Option",
-    buttons: ["Menu 1", "Menu 2"]
-  },
-  footer: {
-    text: "Telegram Channel",
-    url: "https://t.me/aboutvin7x"
-  }
-});
-```
-
-# Sending Message with Participant
+# Send Message with Participant
 
 `relayMessage`:
 
@@ -290,6 +266,28 @@ await client.sendRich(m.chat, {
 		ptcp: true
 	});
 })();
+```
+
+## Rich Menu
+
+`sendRich` sends a rich response with an optional header image, action buttons, carousel cards, and an open-URL footer:
+
+```javascript
+await client.sendRich(m.chat, {
+  header: {
+    disclaimer: true,
+    disclaimerText: "t.me/luyatiem",
+    title: "XvnSynC"
+  },
+  body: {
+    title: "Select Option",
+    buttons: ["Menu 1", "Menu 2"]
+  },
+  footer: {
+    text: "Telegram Channel",
+    url: "https://t.me/aboutvin7x"
+  }
+});
 ```
 
 ---
