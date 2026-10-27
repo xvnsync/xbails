@@ -159,7 +159,7 @@ This build includes the `sPR` helper adapted to this Baileys fork. It exposes a 
 ### Import
 
 ```javascript
-import { sPR } from '@whiskeysockets/baileys';
+const { sPR } = require('@whiskeysockets/baileys');
 ```
 
 ### Basic usage
