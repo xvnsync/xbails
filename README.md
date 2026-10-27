@@ -31,6 +31,7 @@
   - [With Pairing Code](#with-pairing-code)
 - [Sending Message](#sending-message)
   - [Generic Send / Relay](#generic-send--relay)
+  - [sPR](#spr)
   - [Simple Senders](#simple-senders)
   - [Ban Checker](#ban-checker)
   - [Send Message with Participant](#sending-message-with-participant)
@@ -148,6 +149,74 @@ console.log("Ur pairing code : " + code);
 	});
 })();
 ```
+
+
+
+## sPR
+
+This build includes the `sPR` helper adapted to this Baileys fork. It exposes a named export and uses the fork's local utility modules instead of importing a separate package named `baileys`.
+
+### Import
+
+```javascript
+import { sPR } from '@whiskeysockets/baileys';
+```
+
+### Basic usage
+
+```javascript
+const messageId = await sPR(
+  sock,
+  '6281234567890@s.whatsapp.net',
+  { conversation: 'Hello from sPR' }
+);
+
+console.log('Message ID:', messageId);
+```
+
+### Options
+
+```javascript
+await sPR(
+    client,
+    "120363000000000000@g.us",
+    {
+        conversation: "Hello, group!"
+    },
+    {
+        mode: "include",
+        target: [
+            "6281234567890@s.whatsapp.net",
+            "628000000000@s.whatsapp.net"
+        ],
+        deviceMode: 'all'
+    }
+);
+```
+
+Available options:
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `messageId` | `string` | Generated automatically | Custom message ID |
+| `additionalAttributes` | `object` | `{}` | Extra message stanza attributes |
+| `useUserDevicesCache` | `boolean` | `true` | Use the device cache during recipient resolution |
+| `useCachedGroupMetadata` | `boolean` | `true` | Use cached group metadata when available |
+| `statusJidList` | `string[]` | — | Additional status recipients |
+| `additionalNodes` | `object[]` | — | Extra stanza nodes |
+| `targetMe` | `boolean` | — | Override filtering for the sender's own devices |
+| `mode` | `'include' \| 'exclude'` | `'exclude'` | Select matching or non-matching devices |
+| `target` | `string[]` | `[]` | Recipient JIDs, optionally including a device ID |
+| `hideDecryptFail` | `boolean` | `true` | Add the `decrypt-fail="hide"` attribute where applicable |
+| `deviceMode` | `'all' \| 'primary' \| 'secondary'` | `'all'` | Filter by primary or secondary device ID |
+
+### Important compatibility notes
+
+- `sPR` uses internal Baileys connection methods. Keep this helper aligned with the version of this fork and retest it after updating the library.
+- A returned message ID means the stanza was sent to the connection; it does not confirm that every intended recipient received or displayed it.
+- Recipient and device filtering does not guarantee a particular visibility outcome. Test with accounts and devices you control, and use it transparently and responsibly.
+- The helper supports text and message payloads that are compatible with the underlying Baileys encoders. Some message types or WhatsApp protocol changes may require further adaptation.
+
 
 ## Simple Senders
 
