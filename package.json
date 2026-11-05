@@ -1,6 +1,6 @@
 {
     "name": "xbails",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A WebSockets library for interacting with WhatsApp Web.",
     "keywords": [
         "baileys",

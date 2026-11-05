@@ -166,27 +166,29 @@ const { sPR } = require('@whiskeysockets/baileys');
 
 ```javascript
 const messageId = await sPR(
-  sock,
+  client,
   '6281234567890@s.whatsapp.net',
-  { conversation: 'Hello from sPR' }
+  { conversation: 'XvnSynC' }
 );
 
 console.log('Message ID:', messageId);
 ```
 
-### Options
+### Example
 
 ```javascript
-await sPR(client, "120363000000000000@g.us", {
-    conversation: "Hello, group!"
-}, {
-    mode: "include",
-    target: [
-        "6281234567890@s.whatsapp.net",
-        "628000000000@s.whatsapp.net"
-    ],
-    deviceMode: "all"
-});
+(async () => {
+    await sPR(client, "120363000000000000@g.us", {
+        conversation: "XvnSynC"
+    }, {
+        mode: "include",
+        target: [
+            "6281234567890@s.whatsapp.net",
+            "628000000000@s.whatsapp.net"
+        ],
+        deviceMode: "all"
+    });
+})();
 ```
 
 Available options:
