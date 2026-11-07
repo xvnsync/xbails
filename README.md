@@ -31,11 +31,12 @@
   - [With Pairing Code](#with-pairing-code)
 - [Sending Message](#sending-message)
   - [Generic Send / Relay](#generic-send--relay)
-  - [sPR](#spr)
+  - [sendPrivateRelay](#sendprivaterelay)
   - [Simple Senders](#simple-senders)
   - [Ban Checker](#ban-checker)
   - [Send Message with Participant](#sending-message-with-participant)
-  - [Rich Menu](#rich-menu)
+  - [Send Rich](#send-rich)
+  - [Send Html](#send-html)
 - [Message Builder](#message-builder)
   - [Import](#import-1)
   - [Example](#example)
@@ -152,46 +153,73 @@ console.log("Ur pairing code : " + code);
 
 
 
-## sPR
+## sendPrivateRelay
 
-This build includes the `sPR` helper adapted to this Baileys fork. It exposes a named export and uses the fork's local utility modules instead of importing a separate package named `baileys`.
-
-### Import
-
-```javascript
-const { sPR } = require('@whiskeysockets/baileys');
-```
+`sendPrivateRelay` is available directly on the socket client. It sends a message using the private relay helper and accepts the same message payload and relay options as the underlying implementation.
 
 ### Basic usage
 
 ```javascript
-const messageId = await sPR(
-  client,
-  '6281234567890@s.whatsapp.net',
-  { conversation: 'XvnSynC' }
-);
-
-console.log('Message ID:', messageId);
+await client.sendPrivateRelay(m.chat, {
+    conversation: "Hello!"
+});
 ```
 
-### Example
+### Example with device filtering
 
+**Include mode**
 ```javascript
 (async () => {
-    await sPR(client, "120363000000000000@g.us", {
-        conversation: "XvnSynC"
-    }, {
-        mode: "include",
-        target: [
-            "6281234567890@s.whatsapp.net",
-            "628000000000@s.whatsapp.net"
-        ],
-        deviceMode: "all"
-    });
-})();
+    const target = "6281234567890@s.whatsapp.net"
+
+    try {
+        const result = await client.sendPrivateRelay(
+            m.chat,
+            {
+                conversation: "XvnSynC"
+            },
+            {
+                mode: "include",
+                target: [target],
+                deviceMode: "all",
+                hideDecryptFail: true
+            }
+        )
+
+        console.log("Private Relay sent:", result)
+    } catch (error) {
+        console.error("Private Relay failed:", error)
+    }
+})()
 ```
 
-Available options:
+**Exclude mode**
+```javascript
+(async () => {
+    const target = "6281234567890@s.whatsapp.net"
+
+    try {
+        const result = await client.sendPrivateRelay(
+            m.chat,
+            {
+                conversation: "XvnSynC"
+            },
+            {
+                mode: "exclude",
+                target: [target],
+                deviceMode: "all",
+                hideDecryptFail: true
+            }
+        )
+
+        console.log("Private Relay sent:", result)
+    } catch (error) {
+        console.error("Private Relay failed:", error)
+    }
+})()
+```
+
+### Available options
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -207,13 +235,12 @@ Available options:
 | `hideDecryptFail` | `boolean` | `true` | Add the `decrypt-fail="hide"` attribute where applicable |
 | `deviceMode` | `'all' \| 'primary' \| 'secondary'` | `'all'` | Filter by primary or secondary device ID |
 
-### Important compatibility notes
+### Compatibility notes
 
-- `sPR` uses internal Baileys connection methods. Keep this helper aligned with the version of this fork and retest it after updating the library.
-- A returned message ID means the stanza was sent to the connection; it does not confirm that every intended recipient received or displayed it.
+- `sendPrivateRelay` is attached to each socket client, so call it as `client.sendPrivateRelay(jid, message, options)`.
+- The returned message ID indicates that the stanza was sent to the connection; it does not confirm that every intended recipient received or displayed it.
 - Recipient and device filtering does not guarantee a particular visibility outcome. Test with accounts and devices you control, and use it transparently and responsibly.
-- The helper supports text and message payloads that are compatible with the underlying Baileys encoders. Some message types or WhatsApp protocol changes may require further adaptation.
-
+- The helper uses internal Baileys connection methods. Retest it after updating the library because WhatsApp protocol changes may affect compatibility.
 
 ## Simple Senders
 
@@ -277,34 +304,41 @@ Available options:
 })();
 ```
 
-## Ban Checker
+## CheckBan
 
-`checkBan` allows you to check the WhatsApp ban status of a phone number using an external API.
+`client.checkWA()` checks whether a WhatsApp phone number is active, banned, or restricted. It uses the built-in WhatsApp registration and ban-status checks.
 
 ### Example
 
 ```javascript
 (async () => {
-	try {
-		const number = '6281234567890';
-		const result = await checkBan(number);
+    try {
+        const number = '6281234567890'
+        const result = await client.checkWA(number)
 
-		await client.sendMessage(m.chat, {
-			text: JSON.stringify(result, null, 2)
-		});
-	} catch (error) {
-		console.error('Ban Checker Error:', error.message);
-	}
-})();
+        console.log(JSON.stringify(result, null, 4))
+    } catch (error) {
+        console.error(JSON.stringify({
+            error: true,
+            message: error.message
+        }, null, 4))
+    }
+})()
 ```
 
-### Usage
+### Result fields
 
-- Replace `6281234567890` with the phone number you want to check.
-- `checkBan` must already be defined in your bot's environment.
+| Field | Description |
+| --- | --- |
+| `number` | Normalized phone number in international format |
+| `status` | `aktif`, `terbanned`, `diblokir`, `dibatasi_sementara`, or `error` |
+| `isBanned` | Whether the number is reported as banned |
+| `isNeedOfficialWa` | Whether the check indicates that the official WhatsApp app is required |
+| `banInfo` | Additional ban details when available; otherwise `null` |
+| `raw` | Original response data when the check returns additional details |
 
 > [!NOTE]
-> Ban Checker relies on an external API. Its availability and accuracy depend on the API provider. Results are not an official confirmation of a WhatsApp account's ban status.
+> The result depends on WhatsApp's registration and support endpoints. Temporary network issues or changes to WhatsApp's APIs may affect the result, so it should not be treated as an official guarantee of account status.
 
 # Send Message with Participant
 
@@ -334,26 +368,52 @@ Available options:
 })();
 ```
 
-## Rich Menu
+## Send Rich
 
 `sendRich` sends a rich response with an optional header image, action buttons, carousel cards, and an open-URL footer:
 
 ```javascript
-await client.sendRich(m.chat, {
-  header: {
-    disclaimer: true,
-    disclaimerText: "t.me/luyatiem",
-    title: "XvnSynC"
-  },
-  body: {
-    title: "Select Option",
-    buttons: ["Menu 1", "Menu 2"]
-  },
-  footer: {
-    text: "Telegram Channel",
-    url: "https://t.me/aboutvin7x"
-  }
-});
+(async () => {
+    try {
+        await client.sendRich(m.chat, {
+            header: {
+                disclaimer: true,
+                disclaimerText: "t.me/luyatiem",
+                title: "XvnSynC"
+            },
+            body: {
+                title: "Select Option",
+                buttons: ["Menu 1", "Menu 2"]
+            },
+            footer: {
+                text: "Open GitHub",
+                url: "https://github.com/xvnsync"
+            }
+        })
+    } catch (error) {
+        console.error(error)
+    }
+})()
+```
+
+## Send HTML
+
+`sendHtml` sends a message using HTML formatting, allowing you to customize the message content with HTML elements:
+
+```javascript
+(async () => {
+    try {
+        await client.sendHtml(m.chat, `
+            <div>
+                <h2>Hello, World!</h2>
+                <p>This is an <b>HTML formatted</b> message.</p>
+                <p>Welcome to <a href="https://t.me/aboutvin7x">XvnSynC</a>.</p>
+            </div>
+        `)
+    } catch (error) {
+        console.error(error)
+    }
+})()
 ```
 
 ---
@@ -372,7 +432,6 @@ const {
   Carousel,
   AIRich,
   Toolkit,
-  bind,
   MB
 } = require('@whiskeysockets/baileys');
 ```
