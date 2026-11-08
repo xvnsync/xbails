@@ -36,6 +36,7 @@
   - [Ban Checker](#ban-checker)
   - [Send Message with Participant](#sending-message-with-participant)
   - [Send Rich](#send-rich)
+  - [Edit Rich](#edit-rich)
   - [Send Html](#send-html)
 - [Message Builder](#message-builder)
   - [Import](#import-1)
@@ -395,6 +396,117 @@ await client.sendPrivateRelay(m.chat, {
     }
 })()
 ```
+
+## Edit Rich
+
+`editRich` edits a previously sent message in place using the standard WhatsApp "edit message" protocol (`protocolMessage` type `14`). It works with any message key, not just ones created by `sendRich` — including messages sent with `sendHtml`.
+
+```javascript
+await client.editRich(jid, key, content)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| `jid` | `string` | Chat JID the original message was sent to |
+| `key` | `object` or `string` | The original message's key (`{ remoteJid, fromMe, id }`), or just its `id` |
+| `content` | `object` | New content, resolved in this order: `{ message: {...} }` (raw proto), `{ html: '<div>...' }` (same shortcut as `sendHtml`), or `sendRich`-style (`sections` / `header` / `body` / `footer`) |
+
+### Basic usage
+
+```javascript
+(async () => {
+    function textSection(text) {
+        return {
+            __typename: 'GenAIUnifiedResponseSection',
+            view_model: {
+                __typename: 'GenAISingleLayoutViewModel',
+                primitive: {
+                    __typename: 'GenAIMarkdownTextUXPrimitive',
+                    text,
+                    inline_entities: []
+                }
+            }
+        };
+    }
+
+    const loading = await client.sendRich(m.chat, {
+        sections: [textSection('> ◦❒ Loading...')]
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await client.editRich(m.chat, loading.key, {
+        sections: [textSection('> ◦❒ XvnSynC')]
+    });
+})();
+
+```
+
+`sendRich` returns the sent message object, which already carries `.key` — pass that straight into `editRich` once your result is ready.
+
+### Inline edit via `editrich`
+
+`sendRich` also accepts an `editrich` field in its content. When present, it automatically sends the edit right after the original message, after an optional `delay` (ms):
+
+```javascript
+(async () => {
+    await client.sendRich(m.chat, {
+        header: { title: "> ◦❒ Processing..." },
+        editrich: {
+            delay: 1500,
+            header: { title: "> ◦❒ Done!" },
+            body: { buttons: ["OK"] }
+        }
+    })
+})()
+```
+
+Use the inline `editrich` field for a fixed delay; use `editRich`/`sendEditMessage` directly when the edit depends on an async result (uploads, API calls) rather than a timer.
+
+### Editing into an HTML message
+
+Pass `{ html: '...' }` to edit a message into an HTML GenAI primitive — the same content shape `sendHtml` accepts:
+
+```javascript
+// Contoh 1: sendRich -> editRich(html)
+(async () => {
+    const loading = await client.sendRich(m.chat, {
+        header: { title: "Rendering..." }
+    });
+
+    await client.editRich(m.chat, loading.key, {
+        html: `
+            <div>
+                <h2>Hello, World!</h2>
+                <p>This is an <b>HTML formatted</b> message.</p>
+            </div>
+        `
+    });
+})();
+
+// Contoh 2: sendHtml -> editRich(html)
+(async () => {
+    const id = await client.sendHtml(m.chat, `
+        <div>
+            <h2>Rendering...</h2>
+        </div>
+    `);
+
+    await client.editRich(m.chat, id, {
+        html: `
+            <div>
+                <h2>Hello, World!</h2>
+                <p>This is an <b>HTML formatted</b> message.</p>
+            </div>
+        `
+    });
+})();
+
+```
+
+This also works the other way around — editing a message that was originally sent with `sendHtml` back into a `sendRich`-style card, since `editRich` is not tied to how the original message was built; only the message `key` matters.
+
+---
 
 ## Send HTML
 
