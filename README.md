@@ -415,6 +415,8 @@ await client.editRich(jid, key, content)
 
 ```javascript
 (async () => {
+    const target = m.chat;
+
     function textSection(text) {
         return {
             __typename: 'GenAIUnifiedResponseSection',
@@ -429,17 +431,37 @@ await client.editRich(jid, key, content)
         };
     }
 
-    const loading = await client.sendRich(m.chat, {
-        sections: [textSection('> ◦❒ Loading...')]
+    function copySection(text) {
+        return {
+            __typename: 'GenAIUnifiedResponseSection',
+            view_model: {
+                __typename: 'GenAIAddonActionLayoutViewModel',
+                addon_action_type: 'COPY_TO_CLIPBOARD',
+                addon_action_alignment: 'END',
+                primitives: [
+                    {
+                        __typename: 'GenAIMarkdownTextUXPrimitive',
+                        text,
+                        inline_entities: []
+                    }
+                ]
+            }
+        };
+    }
+
+    const loading = await client.sendRich(target, {
+        text: '> ◦❒ Loading...'
     });
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    await client.editRich(m.chat, loading.key, {
-        sections: [textSection('> ◦❒ XvnSynC')]
+    await client.editRich(target, loading.key, {
+        sections: [
+            textSection('# XvnSynC'),
+            copySection('https://t.me/luyatiem')
+        ]
     });
 })();
-
 ```
 
 `sendRich` returns the sent message object, which already carries `.key` — pass that straight into `editRich` once your result is ready.
@@ -461,7 +483,7 @@ await client.editRich(jid, key, content)
 })()
 ```
 
-Use the inline `editrich` field for a fixed delay; use `editRich`/`sendEditMessage` directly when the edit depends on an async result (uploads, API calls) rather than a timer.
+Use the inline `editrich` field for a fixed delay; use `editRich` directly when the edit depends on an async result (uploads, API calls) rather than a timer.
 
 ### Editing into an HTML message
 
@@ -471,10 +493,13 @@ Pass `{ html: '...' }` to edit a message into an HTML GenAI primitive — the sa
 // Contoh 1: sendRich -> editRich(html)
 (async () => {
     const loading = await client.sendRich(m.chat, {
-        header: { title: "Rendering..." }
+        text: '> ◦❒ Loading....'
     });
 
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     await client.editRich(m.chat, loading.key, {
+        title: 'XvnSynC',
         html: `
             <div>
                 <h2>Hello, World!</h2>
@@ -486,22 +511,14 @@ Pass `{ html: '...' }` to edit a message into an HTML GenAI primitive — the sa
 
 // Contoh 2: sendHtml -> editRich(html)
 (async () => {
-    const id = await client.sendHtml(m.chat, `
-        <div>
-            <h2>Rendering...</h2>
-        </div>
-    `);
+    const msg = await client.sendHtml(m.chat, '<h1>Loading...</h1>');
 
-    await client.editRich(m.chat, id, {
-        html: `
-            <div>
-                <h2>Hello, World!</h2>
-                <p>This is an <b>HTML formatted</b> message.</p>
-            </div>
-        `
+    await new Promise(r => setTimeout(r, 2000));
+
+    await client.editRich(m.chat, msg.key, {
+        html: '<h1>Berhasil di-edit!</h1>'
     });
 })();
-
 ```
 
 This also works the other way around — editing a message that was originally sent with `sendHtml` back into a `sendRich`-style card, since `editRich` is not tied to how the original message was built; only the message `key` matters.
