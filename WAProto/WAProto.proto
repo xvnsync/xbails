@@ -1,7 +1,7 @@
 syntax = "proto3";
 package waproto;
 
-/// WhatsApp Version: 2.3000.1053699790
+/// WhatsApp Version: 2.3000.1054660005
 
 message ACP2Setting {
     optional bool enabled = 1;
@@ -516,6 +516,8 @@ message BotCapabilityMetadata {
         AI_MUSE_JARVIS_EXTENDED_CARDS_ENABLED = 85;
         AI_INTERJECTIONS_ENABLED = 86;
         AI_RICH_RESPONSE_READ_ALOUD_ENABLED = 87;
+        AI_RICH_RESPONSE_ITEM_LISTS_ENABLED = 88;
+        RICH_RESPONSE_SIDE_BY_SIDE_BUFFER_BOTH = 89;
     }
 }
 
@@ -829,6 +831,7 @@ enum BotMetricsEntryPoint {
     CONTACTS_TAB = 57;
     NEW_3P_AGENT_CREATION = 58;
     SHARE = 59;
+    BIRTHDAY_BANNER = 60;
 }
 message BotMetricsMetadata {
     optional string destinationId = 1;
@@ -1607,6 +1610,8 @@ message ContextInfo {
     optional string partnerDeepLinkToken = 83;
     optional uint32 sourceExperienceId = 84;
     repeated uint32 sourceExperienceIds = 85 [packed=true];
+    optional bytes foaMutualsSignature = 86;
+    optional fixed32 forwardReachScore = 87;
     message AdReplyInfo {
         optional string advertiserName = 1;
         optional MediaType mediaType = 2;
@@ -1916,6 +1921,9 @@ message Conversation {
     optional ACP2Setting acp2Setting = 64;
     optional bool acp2HistoryWithheld = 65;
     repeated GroupRootKey groupRootKeys = 66;
+    optional bool isWorkGroup = 67;
+    optional int32 nonE2EeType = 68;
+    optional NonE2EEAttestation.AccountType contactAccountEncryptionAttestationType = 69;
     enum EndOfHistoryTransferType {
         COMPLETE_BUT_MORE_MESSAGES_REMAIN_ON_PRIMARY = 0;
         COMPLETE_AND_NO_MORE_MESSAGE_REMAIN_ON_PRIMARY = 1;
@@ -2044,6 +2052,7 @@ message DeviceProps {
     optional PlatformType platformType = 3;
     optional bool requireFullSync = 4;
     optional HistorySyncConfig historySyncConfig = 5;
+    optional string deviceName = 6;
     message AppVersion {
         optional uint32 primary = 1;
         optional uint32 secondary = 2;
@@ -2183,6 +2192,24 @@ message EventAdditionalMetadata {
 
 message EventInviteAdditionalMetadata {
     optional bool isUpdated = 1;
+    optional AccessStatus selfAccessStatus = 2;
+    optional RsvpStatus selfRsvpStatus = 3;
+    optional uint32 selfAdditionalGuestCount = 4;
+    optional int64 selfInviteeLastUpdatedTsUsec = 5;
+    enum AccessStatus {
+        ACCESS_STATUS_UNKNOWN = 0;
+        HAS_ACCESS = 1;
+        LEFT_EVENT = 2;
+        REMOVED_FROM_INVITE_LIST = 3;
+        UNAVAILABLE = 4;
+    }
+    enum RsvpStatus {
+        RSVP_STATUS_UNKNOWN = 0;
+        GOING = 1;
+        NOT_GOING = 2;
+        MAYBE = 3;
+        NO_RESPONSE = 4;
+    }
 }
 
 message EventResponse {
@@ -2283,6 +2310,32 @@ message GroupHistoryWithMessageBytes {
     repeated WebMessageInfoWithMessageBytes commentMessages = 3;
     repeated WebMessageInfoWithMessageBytes outOfWindowPinnedMessages = 4;
     optional WebMessageInfoWithMessageBytes themeMessage = 5;
+}
+
+message GroupMembershipForm {
+    repeated GroupMembershipFormQuestion questions = 1;
+    optional string memberTagPrompt = 2;
+    optional uint32 schemaVersion = 3;
+}
+
+message GroupMembershipFormMemberTagAnswer {
+    optional string prompt = 1;
+    optional string memberTag = 2;
+}
+
+message GroupMembershipFormQuestion {
+    optional string text = 1;
+}
+
+message GroupMembershipFormQuestionAnswer {
+    optional GroupMembershipFormQuestion question = 1;
+    optional string answer = 2;
+}
+
+message GroupMembershipFormSubmission {
+    repeated GroupMembershipFormQuestionAnswer questionAnswers = 1;
+    optional GroupMembershipFormMemberTagAnswer memberTagAnswer = 2;
+    optional uint32 schemaVersion = 3;
 }
 
 message GroupMention {
@@ -2797,6 +2850,8 @@ message Message {
     optional FutureProofMessage botGroupParticipantMessage = 137;
     optional RequestLocationUpdateMessage requestLocationUpdateMessage = 138;
     optional VpcRequestMessage vpcRequestMessage = 139;
+    optional VideoMessage instantVideoMessage = 140;
+    optional PaymentDetailsMessage paymentDetailsMessage = 141;
     message AlbumMessage {
         optional uint32 expectedImageCount = 2;
         optional uint32 expectedVideoCount = 3;
@@ -3113,6 +3168,7 @@ message Message {
         optional uint32 thumbnailWidth = 19;
         optional string caption = 20;
         optional string accessibilityLabel = 21;
+        optional string qrUrl = 23;
     }
     
     message EncCommentMessage {
@@ -3568,6 +3624,7 @@ message Message {
         optional string videoContentUrl = 7;
         optional EmbeddedMusic musicMetadata = 8;
         optional string videoContentCaption = 9;
+        optional string videoId = 10;
         enum SocialMediaPostType {
             NONE = 0;
             REEL = 1;
@@ -3785,6 +3842,25 @@ message Message {
         }
         enum OrderSurface {
             CATALOG = 1;
+        }
+    }
+    
+    message PaymentDetailsMessage {
+        optional ServiceType serviceType = 1;
+        optional Money amount = 2;
+        optional string payeeName = 3;
+        optional string payerName = 4;
+        optional int64 transactionTimestampMs = 5;
+        optional string transactionId = 6;
+        optional Status status = 7;
+        optional ContextInfo contextInfo = 17;
+        enum ServiceType {
+            UNKNOWN = 0;
+            UPI = 1;
+        }
+        enum Status {
+            STATUS_UNKNOWN = 0;
+            SUCCESS = 1;
         }
     }
     
@@ -4681,9 +4757,7 @@ message Message {
     message VpcRequestMessage {
         optional uint32 payloadSchemaVersion = 1;
         optional string requestId = 2;
-        optional string launchRef = 3;
-        optional int64 invitationExpiresAtMs = 4;
-        optional ScopeHint scopeHint = 5;
+        optional ScopeHint scopeHint = 3;
         enum ScopeHint {
             UNKNOWN = 0;
             WA_ONLY = 1;
@@ -5268,9 +5342,38 @@ message PollAdditionalMetadata {
     optional bool pollInvalidated = 1;
     repeated PollNameHashHistoryEntry pollNameHashHistory = 2;
     repeated Message.PollCreationMessage.Option originalOptions = 3;
+    repeated PollOptionReplayEntry pollOptionReplayEntries = 4;
+    optional PollOptionReplayBase pollOptionReplayBase = 5;
     message PollNameHashHistoryEntry {
         optional string editStanzaId = 1;
         optional bytes pollNameHash = 2;
+    }
+    
+    message PollOptionReplayBase {
+        optional int64 boundaryTimestampMs = 1;
+        optional int64 editTimestampMs = 2;
+        repeated Option options = 3;
+        message Option {
+            optional bytes optionHash = 1;
+            optional int64 enteredTimestampMs = 2;
+            optional MessageKey addMessageKey = 3;
+        }
+        
+    }
+    
+    message PollOptionReplayEntry {
+        optional Type type = 1;
+        optional MessageKey messageKey = 2;
+        optional int64 serverTimestampMs = 3;
+        optional int64 editTimestampMs = 4;
+        repeated bytes optionHashes = 5;
+        optional MessageKey revokedMessageKey = 6;
+        enum Type {
+            UNKNOWN = 0;
+            EDIT = 1;
+            ADD = 2;
+            REVOKE = 3;
+        }
     }
     
 }
@@ -7124,6 +7227,7 @@ message WebMessageInfo {
         SPLIT_PAYMENT_MARKED_AS_PAID = 289;
         POLL_OPTIONS_REMOVED = 290;
         POLL_ADDED_OPTION_REMOVED = 291;
+        GROUP_CUSTOM_REACTIONS = 293;
     }
 }
 
