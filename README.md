@@ -34,6 +34,11 @@
   - [sendPrivateRelay](#sendprivaterelay)
   - [Simple Senders](#simple-senders)
   - [Ban Checker](#ban-checker)
+- [Status](#status)
+  - [sendStatus](#sendstatus)
+  - [sendPrivateStatus](#sendprivatestatus)
+  - [sendGroupStatus](#sendgroupstatus)
+- [Report Flow](#report-flow)
   - [Send Message with Participant](#sending-message-with-participant)
   - [Send Rich](#send-rich)
   - [Edit Rich](#edit-rich)
@@ -340,6 +345,110 @@ await client.sendPrivateRelay(m.chat, {
 
 > [!NOTE]
 > The result depends on WhatsApp's registration and support endpoints. Temporary network issues or changes to WhatsApp's APIs may affect the result, so it should not be treated as an official guarantee of account status.
+
+# Status
+
+Send a WhatsApp Status (story) update. `statusJidList` must be the list of contact JIDs allowed to see the status.
+
+## sendStatus
+
+`client.sendStatus()` broadcasts a status update to `status@broadcast`, visible to the contacts listed in `statusJidList`.
+
+```javascript
+const {
+  default: makeWASocket
+} = require('@whiskeysockets/baileys');
+
+const client = makeWASocket({ /* ...config */ });
+
+(async () => {
+    try {
+        await client.sendStatus('Hello from Baileys!', {
+            statusJidList: ['6281234567890@s.whatsapp.net']
+        });
+    } catch (error) {
+        console.error(error);
+    }
+})();
+```
+
+A full message payload can be used instead of plain text:
+
+```javascript
+(async () => {
+    await client.sendStatus({
+        imageMessage: { caption: 'My status' }
+    }, {
+        statusJidList: ['6281234567890@s.whatsapp.net']
+    });
+})();
+```
+
+## sendPrivateStatus
+
+`client.sendPrivateStatus()` sends a status update through the private relay, so it supports the same device-targeting options (`mode`, `target`, `targetMe`, `deviceMode`) as [`sendPrivateRelay`](#sendprivaterelay).
+
+```javascript
+(async () => {
+    try {
+        await client.sendPrivateStatus('Only for a few contacts', {
+            statusJidList: ['6281234567890@s.whatsapp.net']
+        });
+    } catch (error) {
+        console.error(error);
+    }
+})();
+```
+
+## sendGroupStatus
+
+`client.sendGroupStatus()` posts a status update to a specific group. The `jid` must end with `@g.us`.
+
+```javascript
+(async () => {
+    try {
+        await client.sendGroupStatus('120363000000000000@g.us', 'Group status update');
+    } catch (error) {
+        console.error(error);
+    }
+})();
+```
+
+# Report Flow
+
+`client.reportFlow()` reports a chat or group to WhatsApp as spam/abuse through the official report flow.
+
+```javascript
+const { ReportType } = require('@whiskeysockets/baileys');
+
+(async () => {
+    try {
+        const result = await client.reportFlow('6281234567890@s.whatsapp.net', {
+            type: ReportType.OverflowMenuReport, // default, see ReportType
+            isKnownChat: true
+        });
+
+        console.log(JSON.stringify(result, null, 4));
+    } catch (error) {
+        console.error(JSON.stringify({
+            error: true,
+            message: error.message
+        }, null, 4));
+    }
+})();
+```
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `type` | One of the `ReportType` values (default: `ReportType.OverflowMenuReport`) |
+| `source` | Optional JID that triggered the report |
+| `subject` | Optional free-text subject/reason |
+| `isKnownChat` | Whether the reported chat is a known contact |
+
+> [!NOTE]
+> `jid` can be a user JID (`...@s.whatsapp.net`) or a group JID (`...@g.us`).
 
 # Send Message with Participant
 
