@@ -45,7 +45,8 @@
   - [revokeNewsletterStatus](#revokenewsletterstatus)
   - [getNewsletterStatuses](#getnewsletterstatuses)
   - [getNewsletterStatusUpdates](#getnewsletterstatusupdates)
-  - [Send Message with Participant](#sending-message-with-participant)
+- [Send Message with Participant](#sending-message-with-participant)
+- [Rich Message](#rich-message)
   - [Send Rich](#send-rich)
   - [Edit Rich](#edit-rich)
   - [Send Html](#send-html)
@@ -585,6 +586,8 @@ Media status (image/video/gif/audio):
 	});
 })();
 ```
+
+# Rich Message
 
 ## Send Rich
 
