@@ -39,6 +39,12 @@
   - [sendPrivateStatus](#sendprivatestatus)
   - [sendGroupStatus](#sendgroupstatus)
 - [Report Flow](#report-flow)
+- [Newsletter Status](#newsletter-status)
+  - [sendNewsletterStatus](#sendnewsletterstatus)
+  - [sendNewsletterStatusReaction](#sendnewsletterstatusreaction)
+  - [revokeNewsletterStatus](#revokenewsletterstatus)
+  - [getNewsletterStatuses](#getnewsletterstatuses)
+  - [getNewsletterStatusUpdates](#getnewsletterstatusupdates)
   - [Send Message with Participant](#sending-message-with-participant)
   - [Send Rich](#send-rich)
   - [Edit Rich](#edit-rich)
@@ -449,6 +455,108 @@ const { ReportType } = require('@whiskeysockets/baileys');
 
 > [!NOTE]
 > `jid` can be a user JID (`...@s.whatsapp.net`) or a group JID (`...@g.us`).
+
+# Newsletter Status
+
+Publish and manage WhatsApp Channel (newsletter) statuses. `jid` must always be a channel JID ending in `@newsletter`.
+
+## sendNewsletterStatus
+
+`client.sendNewsletterStatus()` publishes a status to a channel and resolves once the server acknowledges it. The returned message also carries the status's `newsletterStatusServerId`, used later for reactions, replies, or fetching.
+
+```javascript
+const {
+  default: makeWASocket
+} = require('@whiskeysockets/baileys');
+
+const client = makeWASocket({ /* ...config */ });
+
+(async () => {
+    try {
+        const status = await client.sendNewsletterStatus('123456789@newsletter', {
+            text: 'Hello from the channel!'
+        });
+
+        console.log('Newsletter status server id:', status.newsletterStatusServerId);
+    } catch (error) {
+        console.error(error);
+    }
+})();
+```
+
+Media status (image/video/gif/audio):
+
+```javascript
+(async () => {
+    await client.sendNewsletterStatus('123456789@newsletter', {
+        image: { url: './photo.jpg' },
+        caption: 'New update'
+    });
+})();
+```
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `parentServerId` | Server id of the status being replied to (required for `question_reshare`) |
+| `responseServerId` | Server id of a question response, when applicable |
+| `interactionType` | `question`, `question_response`, or `question_reshare` |
+| `statusAttribution` | Adds the default newsletter-status attribution to the message (default: `true`) |
+| `ackTimeoutMs` | How long to wait for the server ACK (default: `20000`) |
+| `serverIdTimeoutMs` | How long to wait for the status `server_id` echo (default: `8000`) |
+| `resolveServerId` | Set to `false` to skip waiting for the `server_id` echo |
+
+## sendNewsletterStatusReaction
+
+`client.sendNewsletterStatusReaction()` reacts to a newsletter status. Omit `reaction` to remove an existing reaction.
+
+```javascript
+(async () => {
+    try {
+        await client.sendNewsletterStatusReaction('123456789@newsletter', 1234567890, '❤️');
+    } catch (error) {
+        console.error(error);
+    }
+})();
+```
+
+## revokeNewsletterStatus
+
+`client.revokeNewsletterStatus()` deletes (revokes) a status you previously posted as a channel admin.
+
+```javascript
+(async () => {
+    await client.revokeNewsletterStatus('123456789@newsletter', 'STATUS_MESSAGE_ID');
+})();
+```
+
+## getNewsletterStatuses
+
+`client.getNewsletterStatuses()` fetches the current statuses posted on a channel.
+
+```javascript
+(async () => {
+    const result = await client.getNewsletterStatuses('123456789@newsletter', { count: 20 });
+
+    console.log(JSON.stringify(result, null, 4));
+})();
+```
+
+## getNewsletterStatusUpdates
+
+`client.getNewsletterStatusUpdates()` fetches newer status updates for a channel, optionally paginated with `before` / `after` server ids.
+
+```javascript
+(async () => {
+    const updates = await client.getNewsletterStatusUpdates('123456789@newsletter', { count: 20 });
+
+    console.log(JSON.stringify(updates, null, 4));
+})();
+```
+
+> [!NOTE]
+> All newsletter status methods require the account to be a channel owner/admin with the status-posting capability; otherwise the server rejects the request.
 
 # Send Message with Participant
 
