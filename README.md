@@ -53,10 +53,6 @@
 - [Message Builder](#message-builder)
   - [Import](#import-1)
   - [Example](#example)
-- [Button](#button)
-  - [Quick Reply + URL + Copy](#quick-reply--url--copy)
-- [ButtonV2](#buttonv2)
-- [Carousel](#carousel)
 - [Why Choose WhatsApp Baileys?](#why-choose-whatsapp-baileys)
 - [Contributors](#contributors)
 - [Contact & Support](#contact--support)
@@ -353,6 +349,8 @@ await client.sendPrivateRelay(m.chat, {
 > [!NOTE]
 > The result depends on WhatsApp's registration and support endpoints. Temporary network issues or changes to WhatsApp's APIs may affect the result, so it should not be treated as an official guarantee of account status.
 
+---
+
 # Status
 
 Send a WhatsApp Status (story) update. `statusJidList` must be the list of contact JIDs allowed to see the status.
@@ -421,6 +419,8 @@ A full message payload can be used instead of plain text:
 })();
 ```
 
+---
+
 # Report Flow
 
 `client.reportFlow()` reports a chat or group to WhatsApp as spam/abuse through the official report flow.
@@ -456,6 +456,8 @@ const { ReportType } = require('@whiskeysockets/baileys');
 
 > [!NOTE]
 > `jid` can be a user JID (`...@s.whatsapp.net`) or a group JID (`...@g.us`).
+
+---
 
 # Newsletter Status
 
@@ -559,6 +561,8 @@ Media status (image/video/gif/audio):
 > [!NOTE]
 > All newsletter status methods require the account to be a channel owner/admin with the status-posting capability; otherwise the server rejects the request.
 
+---
+
 # Send Message with Participant
 
 `relayMessage`:
@@ -586,6 +590,8 @@ Media status (image/video/gif/audio):
 	});
 })();
 ```
+
+---
 
 # Rich Message
 
@@ -743,8 +749,6 @@ Pass `{ html: '...' }` to edit a message into an HTML GenAI primitive — the sa
 
 This also works the other way around — editing a message that was originally sent with `sendHtml` back into a `sendRich`-style card, since `editRich` is not tied to how the original message was built; only the message `key` matters.
 
----
-
 ## Send HTML
 
 `sendHtml` sends a message using HTML formatting, allowing you to customize the message content with HTML elements:
@@ -788,8 +792,6 @@ const {
 > [!NOTE]
 > MessageBuilder is integrated. You don't need to install `baileys-mbuilder` separately.
 
----
-
 ## Example
 
 ```javascript
@@ -810,81 +812,6 @@ const rich = new MB.AIRich(sock)
 
 await rich.send(jid)
 ```
-
----
-
-## Button
-
-Builder `Button` is used for native-flow interactive messages.
-
-### Quick Reply + URL + Copy
-
-```js
-const { MB } = require('@whiskeysockets/baileys')
-
-const msg = new MB.Button(client)
-  .setTitle('Select Menu')
-  .setBody('Pilih salah satu di bawah.')
-  .setFooter('t.me/luyatiem')
-  .addReply('Ping', 'ping')
-  .addUrl('Buka Website', 'https://example.com')
-  .addCopy('Salin Kode', 'XVNSYNC')
-
-await msg.send(m.chat)
-```
-
----
-
-## ButtonV2
-
-`ButtonV2` provides a simpler classic button builder.
-
-```javascript
-const { MB } = require('@whiskeysockets/baileys')
-
-const message = new MB.ButtonV2(client)
-  .setTitle('XvnSynC')
-  .setSubtitle('WhatsApp Bot')
-  .setBody('Pilih satu tindakan.')
-  .setFooter('Melvin Baileys')
-  .setThumbnail('https://example.com/xxx.jpg')
-  .addButton('Menu', 'menu')
-  .addButton('Ping', 'ping')
-
-await message.send(m.chat)
-```
-
----
-
-## Carousel
-
-Carousel cards can be created from `Button.toCard()` and then submitted to `Carousel`.
-
-```javascript
-const { MB } = require('@whiskeysockets/baileys')
-
-const card1 = await new MB.Button(client)
-  .setImage('https://example.com/card1.jpg')
-  .setBody('Kartu pertama')
-  .addReply('Pilih', 'card_1')
-  .toCard()
-
-const card2 = await new MB.Button(client)
-  .setImage('https://example.com/card2.jpg')
-  .setBody('Kartu kedua')
-  .addUrl('Buka', 'https://example.com')
-  .toCard()
-
-const carousel = new MB.Carousel(client)
-  .setBody('Pilih salah satu kartu di bawah.')
-  .setFooter('Melvin Carousel')
-  .addCard([card1, card2])
-
-await carousel.send(jid)
-```
-
-> [!IMPORTANT]
-> Each carousel card must have an image or video media attachment in its header.
 
 ---
 
