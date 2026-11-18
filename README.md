@@ -827,8 +827,14 @@ Because this library offers high stability, full features, and an actively impro
   <tr>
     <td align="center">
       <a href="https://github.com/xvnsync">
-        <img src="https://github.com/xvnsync.png" width="80px;" style="border-radius:50%;" alt="Main contributor"/>
+        <img src="https://github.com/xvnsync.png" width="80px;" style="border-radius:50%;" alt="Melvin D Zephyrine"/>
         <br /><sub><b>Melvin D Zephyrine</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/XazepysK">
+        <img src="https://github.com/XazepysK.png" width="80px;" style="border-radius:50%;" alt="Yuukey"/>
+        <br /><sub><b>Yuukey</b></sub>
       </a>
     </td>
   </tr>
@@ -843,9 +849,6 @@ Have questions, suggestions, or need help with this project? Feel free to reach 
 <p align="center">
   <a href="https://t.me/luyatiem">
     <img src="https://img.shields.io/badge/Telegram-Contact%20Developer-26A5E4?style=flat-square&logo=telegram&logoColor=white" alt="Telegram"/>
-  </a>
-  <a href="https://whatsapp.com/channel/0029VbDlfld4yltRwFKFL73X">
-    <img src="https://img.shields.io/badge/WhatsApp-Official%20Channel-25D366?style=flat-square&logo=whatsapp&logoColor=white" alt="WhatsApp Channel"/>
   </a>
   <a href="https://t.me/aboutvin7x">
     <img src="https://img.shields.io/badge/Telegram-Updates-2CA5E0?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Channel"/>
