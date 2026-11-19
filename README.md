@@ -307,6 +307,18 @@ await client.sendPrivateRelay(m.chat, {
 })();
 ```
 
+### Send Image Poll
+
+```javascript
+(async () => {
+	await client.sendImagePoll(m.chat, 'Pilih gambar favoritmu', [
+		{ name: 'Option A', image: { url: './a.jpg' } },
+		{ name: 'Option B', image: { url: './b.jpg' } },
+		{ name: 'Option C', image: { url: './c.jpg' } }
+	], true);
+})();
+```
+
 ### Send Quiz
 
 ```javascript
