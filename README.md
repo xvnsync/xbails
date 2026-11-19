@@ -53,6 +53,8 @@
 - [Message Builder](#message-builder)
   - [Import](#import-1)
   - [Example](#example)
+  - [sendEdit](#sendedit)
+- [Split Payment](#split-payment)
 - [Why Choose WhatsApp Baileys?](#why-choose-whatsapp-baileys)
 - [Contributors](#contributors)
 - [Contact & Support](#contact--support)
@@ -811,6 +813,103 @@ const rich = new MB.AIRich(sock)
   .addSuggest(['List Menu', 'Help', 'About Melvin'])
 
 await rich.send(jid)
+```
+
+## sendEdit
+
+`rich.sendEdit(jid, id, options)` edits an AIRich response that was already sent, replacing its content in place instead of sending a new message. If `jid`/`id` are omitted, it falls back to the key of the last message sent through `.send()`.
+
+```javascript
+const { MB } = require('@whiskeysockets/baileys');
+
+(async () => {
+    const rich = new MB.AIRich(client)
+        .setTitle('XvnSynC')
+        .addText('Loading...');
+
+    const sent = await rich.send(jid);
+
+    // ...later, update the same message in place
+    await rich
+        .setTitle('XvnSynC')
+        .addText('Done!')
+        .sendEdit(jid, sent.key.id);
+})();
+```
+
+Editing the last sent message without passing `jid`/`id`:
+
+```javascript
+(async () => {
+    const rich = new MB.AIRich(client).addText('Step 1');
+    await rich.send(jid);
+
+    await rich.addText('Step 2').sendEdit(); // reuses the last sent jid/id
+})();
+```
+
+> [!NOTE]
+> `sendEdit` only works on a message that was itself sent as an AIRich response (it edits via `botForwardedMessage`/`protocolMessage`, type `14`). Use `buildEdit` instead if you only need the built message payload without relaying it.
+
+---
+
+# Split Payment
+
+`client.sendMessage()` accepts a `splitPayment` shorthand to send a WhatsApp split-the-bill message, splitting a total amount across a list of participants.
+
+```javascript
+const {
+  default: makeWASocket
+} = require('@whiskeysockets/baileys');
+
+const client = makeWASocket({ /* ...config */ });
+
+(async () => {
+    try {
+        await client.sendMessage(jid, {
+            splitPayment: {
+                splitId: 'split-' + Date.now(),
+                total: 150000,
+                currency: 'IDR',
+                description: 'Dinner split',
+                requesterJid: client.user.id,
+                participants: [
+                    { jid: '6281234567890@s.whatsapp.net', amount: 50000 },
+                    { jid: '6289876543210@s.whatsapp.net', amount: 50000 },
+                    { jid: '6281111111111@s.whatsapp.net', amount: 50000 }
+                ]
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
+})();
+```
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `splitId` | Unique id for the split; required, used to key later updates |
+| `total` | Total amount being split, as a plain human number (e.g. `150000`, not scaled) |
+| `currency` | Three letter currency code, e.g. `IDR`, `USD` |
+| `description` | Optional label shown on the split payment message |
+| `requesterJid` | JID of the person requesting the split |
+| `participants` | Array of `{ jid, amount, currency? }`; `amount` is optional per participant |
+
+### Reading an incoming split payment
+
+```javascript
+const { readSplitPayment } = require('@whiskeysockets/baileys');
+
+client.ev.on('messages.upsert', ({ messages }) => {
+    for (const msg of messages) {
+        const split = readSplitPayment(msg);
+        if (split) {
+            console.log(JSON.stringify(split, null, 4));
+        }
+    }
+});
 ```
 
 ---
