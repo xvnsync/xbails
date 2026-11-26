@@ -327,6 +327,37 @@ await client.sendPrivateRelay(m.chat, {
 })();
 ```
 
+### Send Audio Sticker
+
+`client.sendAudioSticker(jid, content, options, quoted)` builds a sticker with an embedded voice/audio message — the recipient sees it as a sticker, but opening it plays the attached audio. Pass exactly one of `sticker` / `image` / `video` as the visual source, plus `audio` (or `audioUrl`) for the sound. Images/videos are converted to webp the same way `sendSticker` does; audio is converted to Opus/Ogg automatically if it isn't already.
+
+Supported `content` fields: `sticker` / `image` / `video` (one of these, any Buffer/URL/stream media input), `audio` or `audioUrl` (required), `pack`, `author`, `emojis` (array), `isPrivate`, `animated`, `quality`.
+
+```javascript
+(async () => {
+	await client.sendAudioSticker(m.chat, {
+		image: { url: './sticker-face.png' },
+		audio: { url: './voice-note.ogg' },
+		pack: 'My Pack',
+		author: 'Me',
+		emojis: ['🎤']
+	});
+})();
+```
+
+It can also be sent through the generic `sendMessage` content key directly:
+
+```javascript
+(async () => {
+	await client.sendMessage(m.chat, {
+		audioSticker: {
+			video: { url: './clip.mp4' },
+			audio: { url: './voice-note.mp3' }
+		}
+	});
+})();
+```
+
 ## CheckBan
 
 `client.checkWA()` checks whether a WhatsApp phone number is active, banned, or restricted. It uses the built-in WhatsApp registration and ban-status checks.
