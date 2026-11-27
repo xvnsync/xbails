@@ -55,6 +55,7 @@
   - [Example](#example)
   - [sendEdit](#sendedit)
 - [Split Payment](#split-payment)
+- [Set Theme Group](#setThemeGroup)
 - [Why Choose WhatsApp Baileys?](#why-choose-whatsapp-baileys)
 - [Contributors](#contributors)
 - [Contact & Support](#contact--support)
@@ -957,33 +958,6 @@ client.ev.on('messages.upsert', ({ messages }) => {
 
 ---
 
-# Why Choose WhatsApp Baileys?
-
-Because this library offers high stability, full features, and an actively improved pairing process. It is ideal for developers aiming to create professional and secure WhatsApp automation solutions. Support for the latest WhatsApp features ensures compatibility with platform updates.
-
----
-
-# Contributors
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/xvnsync">
-        <img src="https://github.com/xvnsync.png" width="80px;" style="border-radius:50%;" alt="Melvin D Zephyrine"/>
-        <br /><sub><b>Melvin D Zephyrine</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/XazepysK">
-        <img src="https://github.com/XazepysK.png" width="80px;" style="border-radius:50%;" alt="Yuukey"/>
-        <br /><sub><b>Yuukey</b></sub>
-      </a>
-    </td>
-  </tr>
-</table>
-
----
-
 ## setThemeGroup
 
 `client.setThemeGroup(jid, content, options)` changes a **group**'s chat theme — wallpaper, bubble color scheme, a named theme preset, a solid background color, or a reset back to the default. `jid` must be a group jid.
@@ -1017,6 +991,33 @@ Because this library offers high stability, full features, and an actively impro
     console.log(await client.setThemeGroup(m.chat, 'example'));
 })();
 ```
+
+---
+
+# Why Choose WhatsApp Baileys?
+
+Because this library offers high stability, full features, and an actively improved pairing process. It is ideal for developers aiming to create professional and secure WhatsApp automation solutions. Support for the latest WhatsApp features ensures compatibility with platform updates.
+
+---
+
+# Contributors
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/xvnsync">
+        <img src="https://github.com/xvnsync.png" width="80px;" style="border-radius:50%;" alt="Melvin D Zephyrine"/>
+        <br /><sub><b>Melvin D Zephyrine</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/XazepysK">
+        <img src="https://github.com/XazepysK.png" width="80px;" style="border-radius:50%;" alt="Yuukey"/>
+        <br /><sub><b>Yuukey</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 ---
 
