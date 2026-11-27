@@ -984,6 +984,42 @@ Because this library offers high stability, full features, and an actively impro
 
 ---
 
+## setThemeGroup
+
+`client.setThemeGroup(jid, content, options)` changes a **group**'s chat theme — wallpaper, bubble color scheme, a named theme preset, a solid background color, or a reset back to the default. `jid` must be a group jid.
+
+`content` accepts one of:
+- `{ theme: 'pink' }` — a named color preset (see `CHAT_THEME_COLOR_PRESETS`) or a built-in theme scheme name (eg. `'royal-blue'`, `'sunset-orange'`, `'royal-blue-tonal'`, `'sky-blue-minimal'`, etc.)
+- `{ bubble: 'royal-blue' }` — only the chat bubble color scheme, independent of wallpaper
+- `{ theme: { url: './wallpaper.jpg' } }` or `{ theme: <Buffer> }` — a custom wallpaper image (GIF/video sources are automatically converted to a still JPEG frame)
+- `{ color: '#1e90ff' }` or `{ color: 'biru' }` — a solid background color instead of an image
+- `{ reset: true }` — resets the group back to the default theme
+- the string `'example'` / `'contoh'` — instead of applying anything, returns the full list of available theme/bubble presets and usage examples
+
+```javascript
+(async () => {
+    // set a named theme
+    await client.setThemeGroup(m.chat, { theme: 'royal-blue' });
+
+    // custom wallpaper image + a bubble color override
+    await client.setThemeGroup(m.chat, {
+        theme: { url: 'https://example.com/wallpaper.jpg' },
+        bubble: 'pink-tonal'
+    });
+
+    // solid color background
+    await client.setThemeGroup(m.chat, { color: '#1e90ff' });
+
+    // reset back to default
+    await client.setThemeGroup(m.chat, { reset: true });
+
+    // list every available preset
+    console.log(await client.setThemeGroup(m.chat, 'example'));
+})();
+```
+
+---
+
 ## Contact & Support
 
 Have questions, suggestions, or need help with this project? Feel free to reach out through the channels below.
